@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "734731390097",
+    "project_id": "thunder-3ba41",
+    "storage_bucket": "thunder-3ba41.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:734731390097:android:df5c1a93cf0d5d29970330",
+        "android_client_info": {
+          "package_name": "com.example.needs_bridge"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC9eqs7TE--g-5CxGvc4862Y0eVHHZuReU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
