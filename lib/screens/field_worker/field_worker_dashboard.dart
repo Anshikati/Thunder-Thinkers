@@ -16,6 +16,14 @@ class FieldWorkerDashboard extends StatefulWidget {
 class _FieldWorkerDashboardState extends State<FieldWorkerDashboard> {
   int _navIndex = 0;
 
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      context.read<NeedsProvider>().loadNeeds();
+    });
+  }
+
   void _onNavTap(int index) {
     setState(() => _navIndex = index);
     switch (index) {

@@ -17,6 +17,15 @@ class AdminDashboard extends StatefulWidget {
 class _AdminDashboardState extends State<AdminDashboard> {
   int _navIndex = 0;
 
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      context.read<NeedsProvider>().loadNeeds();
+      context.read<VolunteerProvider>().loadVolunteers();
+    });
+  }
+
   void _onNavTap(int index) {
     setState(() => _navIndex = index);
     switch (index) {
@@ -62,15 +71,17 @@ class _AdminDashboardState extends State<AdminDashboard> {
               completed: needs.completedCount,
             ),
             const SizedBox(height: 24),
+            const _QuickActions(),
+            const SizedBox(height: 24),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Critical Needs', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+                Text('Recent Needs', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
                 TextButton(onPressed: () => context.push('/admin/map'), child: const Text('See All')),
               ],
             ),
             const SizedBox(height: 8),
-            ...needs.criticalNeeds.take(3).map((n) => Padding(
+            ...needs.needs.take(3).map((n) => Padding(
               padding: const EdgeInsets.only(bottom: 8),
               child: NeedCard(need: n, onTap: () => context.push('/admin/need/${n.id}')),
             )),
@@ -94,7 +105,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/admin/need/new'),
+        onPressed: () => context.push('/admin/add-need'),
         icon: const Icon(Icons.add),
         label: const Text('Add Need'),
       ),
@@ -200,6 +211,67 @@ class _VolunteerChip extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _QuickActions extends StatelessWidget {
+  final _actions = const [
+    (Icons.mic_outlined, 'Voice Report', '/fieldworker/voice', Color(0xFF7B1FA2)),
+    (Icons.document_scanner_outlined, 'Scan Form', '/fieldworker/scan', Color(0xFF1565C0)),
+  ];
+
+  const _QuickActions();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('AI Assistant', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+        const SizedBox(height: 12),
+        Row(
+          children: _actions.map((action) {
+            final (icon, label, route, color) = action;
+            return Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: _ActionButton(icon: icon, label: label, color: color, route: route),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+}
+
+class _ActionButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final String route;
+  const _ActionButton({required this.icon, required this.label, required this.color, required this.route});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => context.push(route),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color.withOpacity(0.3)),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: color, size: 26),
+            const SizedBox(height: 6),
+            Text(label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: color), textAlign: TextAlign.center),
+          ],
+        ),
       ),
     );
   }

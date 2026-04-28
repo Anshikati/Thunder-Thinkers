@@ -1,11 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/app_providers.dart';
-import '../../widgets/map_placeholder.dart';
 import '../../widgets/task_card.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class VolunteerMapScreen extends StatelessWidget {
   const VolunteerMapScreen({super.key});
+
+  Set<Marker> _buildTaskMarkers(List tasks) {
+    final markers = <Marker>{};
+    for (int i = 0; i < tasks.length; i++) {
+      final t = tasks[i];
+      final hue = t.status == 'new'
+          ? BitmapDescriptor.hueBlue
+          : BitmapDescriptor.hueOrange;
+      markers.add(Marker(
+        markerId: MarkerId(t.id),
+        position: LatLng(28.6139 + (i * 0.006), 77.2090 + (i * 0.004)),
+        icon: BitmapDescriptor.defaultMarkerWithHue(hue),
+        infoWindow: InfoWindow(
+          title: t.title,
+          snippet: '${t.urgencyLevel} • ${t.distanceKm} km',
+        ),
+      ));
+    }
+    return markers;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,29 +39,22 @@ class VolunteerMapScreen extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-            child: Stack(
-              children: [
-                const MapPlaceholder(height: 300),
-                Positioned(
-                  top: 12,
-                  right: 12,
-                  child: Column(
-                    children: nearbyTasks.map((t) => Padding(
-                      padding: const EdgeInsets.only(bottom: 4),
-                      child: Container(
-                        width: 36,
-                        height: 36,
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.primary,
-                          shape: BoxShape.circle,
-                          boxShadow: [BoxShadow(color: theme.colorScheme.primary.withOpacity(0.4), blurRadius: 8, spreadRadius: 2)],
-                        ),
-                        child: const Icon(Icons.location_pin, color: Colors.white, size: 20),
-                      ),
-                    )).toList(),
+            child: SizedBox(
+              height: 300,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: GoogleMap(
+                  initialCameraPosition: const CameraPosition(
+                    target: LatLng(28.6139, 77.2090),
+                    zoom: 12,
                   ),
+                  markers: _buildTaskMarkers(nearbyTasks),
+                  myLocationEnabled: false,
+                  myLocationButtonEnabled: false,
+                  zoomControlsEnabled: true,
+                  mapToolbarEnabled: false,
                 ),
-              ],
+              ),
             ),
           ),
           const SizedBox(height: 12),

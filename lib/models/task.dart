@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Task {
   final String id;
   final String needId;
@@ -49,6 +51,30 @@ class Task {
         peopleAffected: (json['peopleAffected'] as num?)?.toInt() ?? 0,
         distanceKm: (json['distanceKm'] as num?)?.toDouble() ?? 0.0,
       );
+
+  /// Create a Task from a Firestore document, handling Timestamps correctly.
+  factory Task.fromFirestore(Map<String, dynamic> data, String id) {
+    return Task(
+      id: id,
+      needId: data['needId'] ?? '',
+      volunteerId: data['volunteerId'] ?? '',
+      status: data['status'] ?? 'new',
+      assignedAt: data['assignedAt'] != null
+          ? (data['assignedAt'] as Timestamp).toDate()
+          : DateTime.now(),
+      completedAt: data['completedAt'] != null
+          ? (data['completedAt'] as Timestamp).toDate()
+          : null,
+      title: data['title'] ?? '',
+      location: data['location'] ?? '',
+      category: data['category'] ?? '',
+      urgencyLevel: data['urgencyLevel'] ?? 'Medium',
+      skillsNeeded: data['skillsNeeded'] ?? '',
+      reportedBy: data['reportedBy'] ?? '',
+      peopleAffected: (data['peopleAffected'] ?? 0).toInt(),
+      distanceKm: (data['distanceKm'] ?? 0).toDouble(),
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         'id': id,

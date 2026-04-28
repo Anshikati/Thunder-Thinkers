@@ -16,6 +16,15 @@ class VolunteerDashboard extends StatefulWidget {
 class _VolunteerDashboardState extends State<VolunteerDashboard> {
   int _currentIndex = 0;
 
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      context.read<VolunteerProvider>().loadTasks();
+      context.read<VolunteerProvider>().loadVolunteers();
+    });
+  }
+
   final List<Widget> _pages = [
     const VolunteerHomeContent(),
     const TaskListScreen(),

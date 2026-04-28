@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../services/firebase_auth_service.dart';
-import '../../../core/router/app_router.dart';
+import '../../app_router.dart';
 import '../../models/app_user.dart';
 
 class SplashScreen extends StatefulWidget {

@@ -5,7 +5,7 @@ import '../../models/task.dart';
 import '../../widgets/urgency_badge.dart';
 import '../../widgets/status_timeline.dart';
 import '../../widgets/category_icon.dart';
-import '../../widgets/map_placeholder.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class TaskDetailScreen extends StatelessWidget {
   final String taskId;
@@ -42,7 +42,28 @@ class TaskDetailScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 16),
-            const MapPlaceholder(height: 180),
+            SizedBox(
+              height: 180,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: GoogleMap(
+                  initialCameraPosition: const CameraPosition(
+                    target: LatLng(28.6139, 77.2090),
+                    zoom: 14,
+                  ),
+                  markers: {
+                    Marker(
+                      markerId: MarkerId(task.id),
+                      position: const LatLng(28.6139, 77.2090),
+                      infoWindow: InfoWindow(title: task.title, snippet: task.location),
+                    ),
+                  },
+                  myLocationEnabled: false,
+                  zoomControlsEnabled: false,
+                  mapToolbarEnabled: false,
+                ),
+              ),
+            ),
             const SizedBox(height: 16),
             Card(
               margin: EdgeInsets.zero,

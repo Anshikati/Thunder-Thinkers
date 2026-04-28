@@ -152,8 +152,9 @@ class NeedDetailScreen extends StatelessWidget {
                 title: Text(v.name, style: const TextStyle(fontWeight: FontWeight.w600)),
                 subtitle: Text(v.skills.take(2).join(', ')),
                 trailing: FilledButton(
-                  onPressed: () {
-                    needsProv.assignVolunteer(need.id, v.id);
+                  onPressed: () async {
+                    await needsProv.assignVolunteer(need.id, v.id);
+                    await volunteerProv.loadVolunteers();
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:go_router/go_router.dart';
+
 import 'firebase_options.dart';
-import 'core/theme/app_theme.dart';
-import 'core/router/app_router.dart';
+import 'app_theme.dart';
+import 'app_router.dart';
 import 'providers/app_providers.dart';
 
 void main() async {
@@ -14,7 +14,7 @@ void main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
   } catch (e) {
-    debugPrint('Firebase not configured yet');
+    debugPrint('Firebase not configured yet: $e');
   }
   runApp(const NeedsBridgeApp());
 }
@@ -31,20 +31,19 @@ class NeedsBridgeApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => VolunteerProvider()),
       ],
       child: Builder(
-        builder: (context) => MaterialApp.router(
-          title: 'NeedsBridge',
-          debugShowCheckedModeBanner: false,
-          theme: AppTheme.light,
-          darkTheme: AppTheme.dark,
-          themeMode: ThemeMode.system,
-          routerConfig: _buildRouterWithProviders(context),
-        ),
+        builder: (context) {
+          final router = buildRouter(context);
+
+          return MaterialApp.router(
+            title: 'NeedsBridge',
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.light,
+            darkTheme: AppTheme.dark,
+            themeMode: ThemeMode.system,
+            routerConfig: router,
+          );
+        },
       ),
     );
   }
-
-  GoRouter _buildRouterWithProviders(BuildContext context) {
-    return buildRouter(context);
-  }
 }
-

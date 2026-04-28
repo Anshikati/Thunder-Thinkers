@@ -3,9 +3,9 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../providers/app_providers.dart';
 import '../../models/need.dart';
-import '../../widgets/map_placeholder.dart';
 import '../../widgets/urgency_badge.dart';
 import '../../widgets/category_icon.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class NeedsMapScreen extends StatefulWidget {
   const NeedsMapScreen({super.key});
@@ -17,10 +17,36 @@ class NeedsMapScreen extends StatefulWidget {
 class _NeedsMapScreenState extends State<NeedsMapScreen> {
   String _activeFilter = 'All';
   final _filterOptions = ['All', 'Food', 'Medical', 'Shelter', 'Education', 'Sanitation'];
+  GoogleMapController? _mapController;
 
   List<Need> _filtered(List<Need> all) {
     if (_activeFilter == 'All') return all;
     return all.where((n) => n.categoryLabel == _activeFilter).toList();
+  }
+
+  Set<Marker> _buildMarkers(List<Need> needs) {
+    // Create markers from needs that have location data
+    // Using a default Delhi position with small offsets for demonstration
+    final markers = <Marker>{};
+    for (int i = 0; i < needs.length; i++) {
+      final n = needs[i];
+      final markerColor = switch (n.urgencyLevel) {
+        UrgencyLevel.critical => BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+        UrgencyLevel.medium => BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
+        UrgencyLevel.low => BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+      };
+      markers.add(Marker(
+        markerId: MarkerId(n.id),
+        position: LatLng(28.6139 + (i * 0.005), 77.2090 + (i * 0.003)),
+        icon: markerColor,
+        infoWindow: InfoWindow(
+          title: n.categoryLabel,
+          snippet: '${n.urgencyLabel} • ${n.location}',
+          onTap: () => context.push('/admin/need/${n.id}'),
+        ),
+      ));
+    }
+    return markers;
   }
 
   @override
@@ -35,9 +61,28 @@ class _NeedsMapScreenState extends State<NeedsMapScreen> {
         children: [
           Column(
             children: [
-              const Padding(
-                padding: EdgeInsets.fromLTRB(16, 12, 16, 0),
-                child: MapPlaceholder(height: 280),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                child: SizedBox(
+                  height: 280,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: GoogleMap(
+                      initialCameraPosition: const CameraPosition(
+                        target: LatLng(28.6139, 77.2090), // Delhi
+                        zoom: 12,
+                      ),
+                      markers: _buildMarkers(filtered),
+                      myLocationEnabled: false,
+                      myLocationButtonEnabled: false,
+                      zoomControlsEnabled: true,
+                      mapToolbarEnabled: false,
+                      onMapCreated: (controller) {
+                        _mapController = controller;
+                      },
+                    ),
+                  ),
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
@@ -79,7 +124,7 @@ class _NeedsMapScreenState extends State<NeedsMapScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/fieldworker/report'),
+        onPressed: () => context.push('/admin/add-need'),
         icon: const Icon(Icons.add),
         label: const Text('Add Need'),
       ),

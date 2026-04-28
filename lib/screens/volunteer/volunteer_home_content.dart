@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import '../../providers/app_providers.dart';
 import '../../models/task.dart';
 
@@ -46,6 +47,10 @@ physics: const AlwaysScrollableScrollPhysics(),
               ),
               const SizedBox(height: 28),
 
+              // 1.5 Quick Actions (AI Tools)
+              const _QuickActions(),
+              const SizedBox(height: 28),
+
               // 2. Stats Cards
               _StatsRow(completed: completedCount, hours: hours, impact: impact),
               const SizedBox(height: 28),
@@ -55,28 +60,6 @@ _SectionHeader(title: 'Urgent Needs Near You'),
               _UrgentNeedsHorizontal(newTasks: volunteerProv.newTasks),
               const SizedBox(height: 28),
 
-              // 4. How NeedsBridge Works
-              _SectionHeader(title: 'How NeedsBridge Works'),
-              _HowItWorksRow(),
-              const SizedBox(height: 28),
-
-              // 5. Smart Features
-              _SectionHeader(title: 'Smart Features'),
-              _SmartFeaturesGrid(),
-              const SizedBox(height: 32),
-
-              // 6. Your Skills in Action
-              _SectionHeader(title: 'Your Skills in Action'),
-              _SkillsChipsRow(),
-              const SizedBox(height: 32),
-
-              // 7. Recent Activity
-              _SectionHeader(title: 'Recent Activity'),
-              _RecentActivityList(),
-              const SizedBox(height: 32),
-
-              // 8. Featured Impact Card
-              _FeaturedImpactCard(),
 
               if (activeTask != null) ...[
                 const SizedBox(height: 24),
@@ -734,3 +717,63 @@ class _ActiveTaskCard extends StatelessWidget {
   }
 }
 
+class _QuickActions extends StatelessWidget {
+  final _actions = const [
+    (Icons.mic_outlined, 'Voice Report', '/fieldworker/voice', Color(0xFF7B1FA2)),
+    (Icons.document_scanner_outlined, 'Scan Form', '/fieldworker/scan', Color(0xFF1565C0)),
+  ];
+
+  const _QuickActions();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('AI Assistant', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+        const SizedBox(height: 12),
+        Row(
+          children: _actions.map((action) {
+            final (icon, label, route, color) = action;
+            return Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: _ActionButton(icon: icon, label: label, color: color, route: route),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+}
+
+class _ActionButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final String route;
+  const _ActionButton({required this.icon, required this.label, required this.color, required this.route});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => context.push(route),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color.withOpacity(0.3)),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: color, size: 26),
+            const SizedBox(height: 6),
+            Text(label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: color), textAlign: TextAlign.center),
+          ],
+        ),
+      ),
+    );
+  }
+}
