@@ -22,7 +22,8 @@ class _VolunteerDashboardState extends State<VolunteerDashboard> {
   void initState() {
     super.initState();
     Future.microtask(() {
-      context.read<VolunteerProvider>().loadTasks();
+      final userId = context.read<AuthProvider>().currentUser?.id;
+      context.read<VolunteerProvider>().loadTasks(volunteerId: userId);
       context.read<VolunteerProvider>().loadVolunteers();
     });
 

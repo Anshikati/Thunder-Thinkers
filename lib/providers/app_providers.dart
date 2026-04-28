@@ -246,8 +246,10 @@ class VolunteerProvider extends ChangeNotifier {
     notifyListeners();
     try {
       if (useFirebase) {
-        // Not stubbed in FirebaseVolunteerService, placeholder for now
-        _tasks = _tasks;
+        _tasks = await FirebaseVolunteerService().fetchTasks(
+          volunteerId: volunteerId,
+          status: status,
+        );
       } else {
         _tasks = await ApiService.fetchTasks(
           volunteerId: volunteerId,

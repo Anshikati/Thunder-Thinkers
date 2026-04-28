@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/volunteer.dart';
+import '../models/task.dart';
 
 class FirebaseVolunteerService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -10,6 +11,18 @@ class FirebaseVolunteerService {
       final data = doc.data();
       return Volunteer.fromJson({...data, 'id': doc.id});
     }).toList();
+  }
+
+  Future<List<Task>> fetchTasks({String? volunteerId, String? status}) async {
+    Query<Map<String, dynamic>> query = _firestore.collection('tasks');
+    if (volunteerId != null) {
+      query = query.where('volunteerId', isEqualTo: volunteerId);
+    }
+    if (status != null) {
+      query = query.where('status', isEqualTo: status);
+    }
+    final snapshot = await query.get();
+    return snapshot.docs.map((doc) => Task.fromFirestore(doc.data(), doc.id)).toList();
   }
 
   Future<void> updateTaskStatus(String taskId, String status) async {

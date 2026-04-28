@@ -50,15 +50,17 @@ class VolunteerHomeContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final volunteerProv = context.watch<VolunteerProvider>();
+    final authProv = context.watch<AuthProvider>();
+    final userId = authProv.currentUser?.id;
 
-    final activeTask = volunteerProv.activeTaskFor('v3');
+    final activeTask = volunteerProv.activeTaskFor(userId ?? '');
     final completedCount = volunteerProv.completedTasks.length;
     final hours = 68;
     final impact = 420;
 
     return RefreshIndicator(
       onRefresh: () async {
-        await volunteerProv.loadTasks();
+        await volunteerProv.loadTasks(volunteerId: userId);
       },
       child: Container(
         decoration: const BoxDecoration(
