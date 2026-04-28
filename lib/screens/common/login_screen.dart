@@ -59,6 +59,57 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  void _showGuestOptions() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (context) => Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Continue as Guest', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800)),
+            const SizedBox(height: 8),
+            const Text('Which dashboard would you like to explore?', textAlign: TextAlign.center),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => context.go('/admin'),
+                    style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                    child: const Column(
+                      children: [
+                        Icon(Icons.admin_panel_settings_outlined),
+                        SizedBox(height: 4),
+                        Text('NGO Admin'),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => context.go('/volunteer'),
+                    style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                    child: const Column(
+                      children: [
+                        Icon(Icons.volunteer_activism_outlined),
+                        SizedBox(height: 4),
+                        Text('Volunteer'),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+          ],
+        ),
+      ),
+    );
+  }
+
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;
     final auth = context.read<AuthProvider>();
@@ -162,6 +213,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
+                Center(
+                  child: TextButton.icon(
+                    onPressed: _showGuestOptions,
+                    icon: const Icon(Icons.person_search_outlined, size: 20),
+                    label: const Text('Login as Guest for Demo & Judges', style: TextStyle(fontWeight: FontWeight.w600)),
+                  ),
+                ),
+                const SizedBox(height: 8),
                 Center(
                   child: TextButton(
                     onPressed: () => context.push('/signup'),

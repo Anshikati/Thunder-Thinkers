@@ -36,7 +36,9 @@ GoRouter buildRouter(BuildContext context) {
     if (user == null) {
       return path.startsWith('/splash') ||
           path == '/login' ||
-          path == '/signup';
+          path == '/signup' ||
+          path.startsWith('/admin') ||
+          path.startsWith('/volunteer');
     }
 
     final rolePaths = {

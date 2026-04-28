@@ -16,6 +16,8 @@ class VolunteerDashboard extends StatefulWidget {
 class _VolunteerDashboardState extends State<VolunteerDashboard> {
   int _currentIndex = 0;
 
+  late final List<Widget> _pages;
+
   @override
   void initState() {
     super.initState();
@@ -23,14 +25,14 @@ class _VolunteerDashboardState extends State<VolunteerDashboard> {
       context.read<VolunteerProvider>().loadTasks();
       context.read<VolunteerProvider>().loadVolunteers();
     });
-  }
 
-  final List<Widget> _pages = [
-    const VolunteerHomeContent(),
-    const TaskListScreen(),
-    const VolunteerMapScreen(),
-    const ProfileScreen(),
-  ];
+    _pages = [
+      VolunteerHomeContent(onExploreTasks: () => _onTabSelected(1)),
+      const TaskListScreen(),
+      const VolunteerMapScreen(),
+      const ProfileScreen(),
+    ];
+  }
 
   void _onTabSelected(int index) {
     setState(() {

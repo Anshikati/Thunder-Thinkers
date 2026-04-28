@@ -64,6 +64,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            _NGOHeroBanner(
+              onAddNeed: () => context.push('/admin/add-need'),
+            ),
+            const SizedBox(height: 28),
             _StatsRow(
               total: needs.totalCount,
               pending: needs.pendingCount,
@@ -129,16 +133,20 @@ class _StatsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        _StatCard(label: 'Total', value: '$total', color: Theme.of(context).colorScheme.primary),
-        const SizedBox(width: 10),
-        _StatCard(label: 'Pending', value: '$pending', color: const Color(0xFFF57C00)),
-        const SizedBox(width: 10),
-        _StatCard(label: 'Active', value: '$inProgress', color: const Color(0xFF1565C0)),
-        const SizedBox(width: 10),
-        _StatCard(label: 'Done', value: '$completed', color: const Color(0xFF388E3C)),
-      ],
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      clipBehavior: Clip.none,
+      child: Row(
+        children: [
+          _StatCard(label: 'Total Reports', value: '$total', color: Theme.of(context).colorScheme.primary),
+          const SizedBox(width: 12),
+          _StatCard(label: 'Pending', value: '$pending', color: const Color(0xFFF57C00)),
+          const SizedBox(width: 12),
+          _StatCard(label: 'In Progress', value: '$inProgress', color: const Color(0xFF1565C0)),
+          const SizedBox(width: 12),
+          _StatCard(label: 'Resolved', value: '$completed', color: const Color(0xFF388E3C)),
+        ],
+      ),
     );
   }
 }
@@ -152,21 +160,20 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.3)),
-        ),
-        child: Column(
-          children: [
-            Text(value, style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800, color: color)),
-            const SizedBox(height: 2),
-            Text(label, style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
-          ],
-        ),
+    return Container(
+      width: 110,
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: color.withOpacity(0.2)),
+      ),
+      child: Column(
+        children: [
+          Text(value, style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800, color: color)),
+          const SizedBox(height: 4),
+          Text(label, style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onSurfaceVariant, fontWeight: FontWeight.w600), textAlign: TextAlign.center),
+        ],
       ),
     );
   }
@@ -270,6 +277,59 @@ class _ActionButton extends StatelessWidget {
             Icon(icon, color: color, size: 26),
             const SizedBox(height: 6),
             Text(label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: color), textAlign: TextAlign.center),
+          ],
+        ),
+      ),
+    );
+  }
+}
+class _NGOHeroBanner extends StatelessWidget {
+  final VoidCallback onAddNeed;
+  const _NGOHeroBanner({required this.onAddNeed});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 4,
+      shadowColor: Colors.black12,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      child: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF1565C0), Color(0xFF1E88E5)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(24),
+        ),
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(Icons.analytics_outlined, color: Colors.white, size: 32),
+            const SizedBox(height: 16),
+            Text(
+              'Coordinate. Respond. Save Lives.',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.w800),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Monitor real-time needs and manage your volunteer force efficiently.',
+              style: TextStyle(color: Colors.white70),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton.icon(
+              onPressed: onAddNeed,
+              icon: const Icon(Icons.add),
+              label: const Text('Add Manual Report'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: const Color(0xFF1565C0),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              ),
+            ),
           ],
         ),
       ),

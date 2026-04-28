@@ -8,7 +8,44 @@ import '../../models/task.dart';
 import '../../widgets/category_icon.dart';
 
 class VolunteerHomeContent extends StatelessWidget {
-  const VolunteerHomeContent({super.key});
+  final VoidCallback? onExploreTasks;
+  
+  const VolunteerHomeContent({super.key, this.onExploreTasks});
+
+  void _showHowItWorks(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(24),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2))),
+            const SizedBox(height: 24),
+            Text('How NeedsBridge Works', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
+            const SizedBox(height: 24),
+            const _HowItWorksRow(),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
+                child: const Text('Got it!'),
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,10 +77,15 @@ physics: const AlwaysScrollableScrollPhysics(),
               // 1. Hero Banner
               _HeroBanner(
                 onExplore: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Explore Tasks - Go to Tasks tab!')),
-                  );
+                  if (onExploreTasks != null) {
+                    onExploreTasks!();
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Explore Tasks - Go to Tasks tab!')),
+                    );
+                  }
                 },
+                onHowItWorks: () => _showHowItWorks(context),
               ),
               const SizedBox(height: 28),
 
@@ -65,6 +107,14 @@ _SectionHeader(title: 'Urgent Needs Near You'),
                 const SizedBox(height: 24),
                 _ActiveTaskCard(task: activeTask),
               ],
+              
+              const SizedBox(height: 28),
+              _SectionHeader(title: 'Filter by Skills'),
+              const _SkillsChipsRow(),
+              
+              const SizedBox(height: 28),
+              _SectionHeader(title: 'Recent Activity'),
+              const _RecentActivityList(),
             ],
           ),
         ),
@@ -75,7 +125,8 @@ _SectionHeader(title: 'Urgent Needs Near You'),
 
 class _HeroBanner extends StatelessWidget {
   final VoidCallback onExplore;
-  const _HeroBanner({required this.onExplore});
+  final VoidCallback onHowItWorks;
+  const _HeroBanner({required this.onExplore, required this.onHowItWorks});
 
   @override
   Widget build(BuildContext context) {
@@ -112,9 +163,13 @@ class _HeroBanner extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
-            Row(
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              alignment: WrapAlignment.center,
               children: [
-                Expanded(
+                SizedBox(
+                  width: double.infinity,
                   child: ElevatedButton(
                     onPressed: onExplore,
                     style: ElevatedButton.styleFrom(
@@ -126,16 +181,17 @@ class _HeroBanner extends StatelessWidget {
                     child: const Text('Explore Tasks', style: TextStyle(fontWeight: FontWeight.w700)),
                   ),
                 ),
-                const SizedBox(width: 12),
-                OutlinedButton(
-                  onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Learn how NeedsBridge works!')),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton(
+                    onPressed: onHowItWorks,
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Colors.white70, width: 1.5),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    child: const Text('How it works', style: TextStyle(fontWeight: FontWeight.w600)),
                   ),
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Colors.white70, width: 1.5),
-                    foregroundColor: Colors.white,
-                  ),
-                  child: const Text('How it works', style: TextStyle(fontWeight: FontWeight.w600)),
                 ),
               ],
             ),
@@ -158,14 +214,18 @@ class _StatsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(child: _StatCard(label: 'Tasks\nCompleted', value: '$completed', icon: Icons.task_alt, color: const Color(0xFF2E7D32))),
-        const SizedBox(width: 16),
-        Expanded(child: _StatCard(label: 'Hours\nContributed', value: '$hours', icon: Icons.schedule, color: const Color(0xFF1565C0))),
-        const SizedBox(width: 16),
-        Expanded(child: _StatCard(label: 'Community\nImpact', value: '$impact', icon: Icons.people, color: const Color(0xFF4CAF50))),
-      ],
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      clipBehavior: Clip.none,
+      child: Row(
+        children: [
+          SizedBox(width: 140, child: _StatCard(label: 'Tasks\nCompleted', value: '$completed', icon: Icons.task_alt, color: const Color(0xFF2E7D32))),
+          const SizedBox(width: 16),
+          SizedBox(width: 140, child: _StatCard(label: 'Hours\nContributed', value: '$hours', icon: Icons.schedule, color: const Color(0xFF1565C0))),
+          const SizedBox(width: 16),
+          SizedBox(width: 140, child: _StatCard(label: 'Community\nImpact', value: '$impact', icon: Icons.people, color: const Color(0xFF4CAF50))),
+        ],
+      ),
     );
   }
 }
@@ -189,15 +249,15 @@ class _StatCard extends StatelessWidget {
       shadowColor: color.withOpacity(0.3),
       shape: RoundedRectangleBorder(borderRadius: const BorderRadius.all(Radius.circular(20))),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(icon, color: color, size: 28),
             const SizedBox(height: 12),
-            Text(value, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: Color(0xFF1A1A1A))),
+            Text(value, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: Color(0xFF1A1A1A))),
             const SizedBox(height: 4),
-            Text(label, style: TextStyle(fontSize: 12, color: const Color(0xFF666666), fontWeight: FontWeight.w600), textAlign: TextAlign.center),
+            Text(label, style: const TextStyle(fontSize: 12, color: Color(0xFF666666), fontWeight: FontWeight.w600), textAlign: TextAlign.center),
           ],
         ),
       ),
@@ -239,9 +299,11 @@ class _UrgentNeedsHorizontal extends StatelessWidget {
   Widget build(BuildContext context) {
     final demoTasks = _getDemoUrgentTasks();
     return SizedBox(
-      height: 160,
+      height: 180,
       child: ListView(
         scrollDirection: Axis.horizontal,
+        clipBehavior: Clip.none,
+        padding: const EdgeInsets.symmetric(vertical: 4),
         children: [
           ...demoTasks.map((task) => _UrgentTaskCard(task: task)),
           if (newTasks.isNotEmpty) ...newTasks.take(1).map((task) => _UrgentTaskCard(task: task)),
@@ -323,7 +385,7 @@ class _UrgentTaskCard extends StatelessWidget {
   Widget build(BuildContext context) {
     Color badgeColor = task.urgencyLevel == 'Critical' ? Colors.red : Colors.orange;
     return Card(
-      margin: const EdgeInsets.only(right: 16),
+      margin: const EdgeInsets.only(right: 16, bottom: 12),
       elevation: 4,
       child: InkWell(
         borderRadius: BorderRadius.circular(20),
@@ -353,9 +415,19 @@ class _UrgentTaskCard extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 12),
-              Text(task.title ?? '', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+              Text(
+                task.title ?? '', 
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
               const SizedBox(height: 4),
-              Text(task.location ?? '', style: TextStyle(color: const Color(0xFF666666))),
+              Text(
+                task.location ?? '', 
+                style: TextStyle(color: const Color(0xFF666666)),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ],
           ),
         ),
@@ -395,26 +467,30 @@ class _HowItWorksRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(child: _FeatureCard(
-          icon: Icons.business,
-          title: 'NGOs post needs',
-          subtitle: 'Field workers report community needs via voice/app',
-        )),
-        const SizedBox(width: 16),
-        Expanded(child: _FeatureCard(
-          icon: Icons.smart_toy,
-          title: 'AI prioritizes & matches',
-          subtitle: 'Urgency ranking + skill/location matching',
-        )),
-        const SizedBox(width: 16),
-        Expanded(child: _FeatureCard(
-          icon: Icons.check_circle,
-          title: 'Volunteers take action',
-          subtitle: 'Real-time tracking & completion',
-        )),
-      ],
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      clipBehavior: Clip.none,
+      child: Row(
+        children: [
+          SizedBox(width: 160, child: _FeatureCard(
+            icon: Icons.business,
+            title: 'NGOs post needs',
+            subtitle: 'Field workers report community needs via voice/app',
+          )),
+          const SizedBox(width: 16),
+          SizedBox(width: 160, child: _FeatureCard(
+            icon: Icons.smart_toy,
+            title: 'AI matches',
+            subtitle: 'Urgency ranking + skill/location matching',
+          )),
+          const SizedBox(width: 16),
+          SizedBox(width: 160, child: _FeatureCard(
+            icon: Icons.check_circle,
+            title: 'You take action',
+            subtitle: 'Real-time tracking & completion',
+          )),
+        ],
+      ),
     );
   }
 }
